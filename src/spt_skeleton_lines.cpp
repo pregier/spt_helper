@@ -6,18 +6,24 @@ geometry_msgs::Point transformToGpoint(const std::string& parent_frame, const st
                                        const tf::TransformListener& listener, tf::StampedTransform& transform,
                                        geometry_msgs::Point& tmpPoint)
 {
-  try {
-    listener.lookupTransform(parent_frame, child_frame, ros::Time(0), transform);
-  } catch(const tf::LookupException& e) {
-    ROS_ERROR("Could not lookup transform %s -> %s: %s", parent_frame.c_str(), child_frame.c_str(), e.what());
+  if (listener.canTransform(parent_frame, child_frame, ros::Time(0)))
+  {
+    try
+    {
+
+      listener.lookupTransform(parent_frame, child_frame, ros::Time(0), transform);
+    }
+    catch (const tf::LookupException& e)
+    {
+      ROS_ERROR("Could not lookup transform %s -> %s: %s", parent_frame.c_str(), child_frame.c_str(), e.what());
+      return tmpPoint;
+    }
+    tmpPoint.x = transform.getOrigin().x();
+    tmpPoint.y = transform.getOrigin().y();
+    tmpPoint.z = transform.getOrigin().z();
     return tmpPoint;
   }
-  tmpPoint.x = transform.getOrigin().x();
-  tmpPoint.y = transform.getOrigin().y();
-  tmpPoint.z = transform.getOrigin().z();
-  return tmpPoint;
 }
-
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "spt_skeleton_lines");
@@ -36,7 +42,7 @@ int main(int argc, char** argv)
   {
     visualization_msgs::Marker line_list;
     line_list.header.frame_id = frame_id;
-    line_list.header.stamp = ros::Time::now();
+    line_list.header.stamp = ros::Time(0);
     line_list.action = visualization_msgs::Marker::ADD;
     line_list.pose.orientation.w = 1.0;
 
@@ -44,14 +50,13 @@ int main(int argc, char** argv)
 
     line_list.type = visualization_msgs::Marker::LINE_LIST;
 
-
     line_list.scale.x = 0.05;
 
     // Line list is red
     line_list.color.b = 1.0;
     line_list.color.a = 1.0;
 
-    joint_points.push_back(transformToGpoint(frame_id, "head", listener, transform, tmpPoint)) ;
+    joint_points.push_back(transformToGpoint(frame_id, "head", listener, transform, tmpPoint));
     joint_points.push_back(transformToGpoint(frame_id, "neck", listener, transform, tmpPoint));
     joint_points.push_back(transformToGpoint(frame_id, "torso", listener, transform, tmpPoint));
 
@@ -61,10 +66,10 @@ int main(int argc, char** argv)
 
     joint_points.push_back(transformToGpoint(frame_id, "right_shoulder", listener, transform, tmpPoint));
     joint_points.push_back(transformToGpoint(frame_id, "right_elbow", listener, transform, tmpPoint));
-    joint_points.push_back( transformToGpoint(frame_id, "right_hand", listener, transform, tmpPoint));
+    joint_points.push_back(transformToGpoint(frame_id, "right_hand", listener, transform, tmpPoint));
 
     joint_points.push_back(transformToGpoint(frame_id, "left_hip", listener, transform, tmpPoint));
-    joint_points.push_back( transformToGpoint(frame_id, "left_knee", listener, transform, tmpPoint));
+    joint_points.push_back(transformToGpoint(frame_id, "left_knee", listener, transform, tmpPoint));
     joint_points.push_back(transformToGpoint(frame_id, "left_foot", listener, transform, tmpPoint));
 
     joint_points.push_back(transformToGpoint(frame_id, "right_hip", listener, transform, tmpPoint));
@@ -117,7 +122,6 @@ int main(int argc, char** argv)
 
     line_list.points.clear();
     joint_points.clear();
-
 
     r.sleep();
 
