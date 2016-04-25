@@ -24,6 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
   interactive_markers
   visualization_msgs
   geometry_msgs
+  squirrel_person_tracker_msgs
 )
 
 
@@ -59,4 +60,5 @@ target_link_libraries(spt_markers ${catkin_LIBRARIES})
 add_executable(spt_skeleton src/spt_skeleton_lines.cpp)
 target_link_libraries(spt_skeleton ${catkin_LIBRARIES})
 
-
+add_executable(spt_user_info src/spt_user_info.cpp)
+target_link_libraries(spt_user_info ${catkin_LIBRARIES})

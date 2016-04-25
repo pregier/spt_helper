@@ -33,9 +33,7 @@ int main(int argc, char** argv)
   color.b = 0.0f;
   color.r = 1.0f;
   color.g = 0.0f;
-//
-// Marker
-//
+
 
   visualization_msgs::Marker markerCube;
   visualization_msgs::Marker markerSphere;
